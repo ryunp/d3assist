@@ -3,7 +3,7 @@
 The idea is to create plugins that will help reduce common and repetitive tasks that cause high cognitive resource drain. Small meanial tasks that interupt the flow of mindless grinding eventually add up. I imagine this application like a character attribute: you gain varying -% CRD (Cognitive Resource Drain) for each plugins effectiveness.
 
 What this does not do:
--Automate gameplay
+- Automate gameplay
 - Play for you
 - Grind for you
 - Farm for you
