@@ -125,6 +125,7 @@ class UI {
 		launcher.play()
 		sleep 300
 		MouseMove, mX, mY
+		Click
 	}
 
 	; COUPLING DETECTED
