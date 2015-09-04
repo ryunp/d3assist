@@ -13,7 +13,7 @@ What this does not do:
 - Workwork
 
 What I imagine:
-- Blacksmith taks: salvage white, blue, and yellow items, repair gear on hotkey
+- Blacksmith taks: salvage white, blue, and yellow items, repair gear
 - Gear Swap: Particularly Nemisis Bracers for spawning champs
 - Possibly gear set swaps
 - Skill set swaps: Predefined slot/skill/rune sets to have changed for you (calling it now: future patch feature)
