@@ -47,7 +47,7 @@ class Launcher {
 
 		TrayTip, Hell Senses Your Presence..., LOLOLANALRAPE MORE LACUNI/REAPER GRIFTS WITHOUT STONESINGER
 		
-		;click
+		click
 	}
 
 	exit() {
