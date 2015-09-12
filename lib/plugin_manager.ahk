@@ -25,10 +25,16 @@ class Plugin_Manager {
 	; Merge saved config data with live data
 	mergeConfig(pluginHash) {
 		for pluginName, dataHash in pluginHash {
-			plugin := this.collection[pluginName]
+			; Skip if plugin is not installed
+			if not (plugin := this.collection[pluginName])
+				continue
+
+			; Merge the relevant data into live object
 			for setting, value in dataHash {
 				plugin[setting] := value
 			}
+
+			; Activate if need be
 			if plugin.active
 				this.enable(plugin.name)
 		}
