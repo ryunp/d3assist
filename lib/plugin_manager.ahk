@@ -1,5 +1,7 @@
 ; Replies on base plugin class to be iherited for usage. Prototyping more so.
 
+#include lib/plugin_loader.ahk
+
 class Plugin_Manager {
 	pluginsDir := "plugins"
 	pluginsFile := "plugins.ahk"
@@ -10,29 +12,25 @@ class Plugin_Manager {
 	}
 
 	; Register all plugins
-	init() {
-		this.loadAll()
-	}
-
-	; Parse the dynamically loaded plugin names as strings to dynamically
-	; create new objects
-	loadAll() {
-		; Scan file where plugins were detected and #included for plugin names
-		names := this.parsePluginsFile()
-
-		; Create a plugin object for each found
-		for i, name in names {
-			; Adjust plugin pathing ('plugin' prefix)
-			className := "Plugin_" . name
-
-			; Dynamically create new object 
-			plugin := new %className%
-
-			; Add to hash with name as key
+	loadAvailable() {
+		loader := new Plugin_Loader(this.pluginsFile)
+		for i, plugin in loader.getPlugins() {
 			this.collection[plugin.name] := plugin
 
 			; Set plugin's API reference
 			;plugin.setAPI(api)
+		}
+	}
+
+	; Merge saved config data with live data
+	mergeConfig(pluginHash) {
+		for pluginName, dataHash in pluginHash {
+			plugin := this.collection[pluginName]
+			for setting, value in dataHash {
+				plugin[setting] := value
+			}
+			if plugin.active
+				this.enable(plugin.name)
 		}
 	}
 
@@ -41,12 +39,11 @@ class Plugin_Manager {
 		return this.collection[name]
 	}
 
-	; Returns hash of plugin objects
-	getAll() {
-		all := []
+	getList() {
+		collection := []
 		for k, plugin in this.collection
-			all.push(plugin)
-		return all
+			collection.push(plugin)
+		return collection
 	}
 
 	; Activate a plugin by name
@@ -61,7 +58,7 @@ class Plugin_Manager {
 		hotkey, % plugin.hotkey, % plugin, On
 		
 		; Log event
-		log.add(plugin.name " enabled")
+		logManager.add(plugin.name " enabled")
 	}
 
 	; Disable a plugin by name
@@ -76,7 +73,7 @@ class Plugin_Manager {
 		hotkey, % plugin.hotkey, Off
 
 		; Log event
-		log.add(plugin.name " disabled")
+		logManager.add(plugin.name " disabled")
 	}
 
 	; Toggle plugin on/off
@@ -94,7 +91,7 @@ class Plugin_Manager {
 		plugin := this.collection[name]
 
 		; Log event
-		log.add(plugin.name " hotkey updated from " plugin.hotkey " to " key)
+		logManager.add(plugin.name " hotkey updated from " plugin.hotkey " to " key)
 
 		; Set OS hotkey state
 		hotkey, % plugin.hotkey, % plugin, Off
@@ -114,36 +111,6 @@ class Plugin_Manager {
 
 		; Remove from internal collections
 		this.collection.delete(name)
-	}
-
-	; Parse the dynamically created plugin include file to determine which
-	; plugins have been loaded
-	parsePluginsFile() {
-		; Open plugins file
-		fh := FileOpen(this.pluginsFile, "r")
-
-		; List to hold plugin names
-		found := []
-
-		; Search for plugin files
-		while (line := fh.ReadLine()) {
-			; Skip comment lines
-			if not (substr(line,1,1) = ";") {
-				; 'Options)': [i] Match case-insensitive, [O] return matching Object
-				RegExMatch(line, "iO)#include\s*\w*\\(.*).plugin.ahk", match)
-
-				; Check that it found a matching string
-				if (match.pos) {
-					; Add plugin name to array of names
-					found.push(match.value(1))
-				}
-			}
-		}
-		; Close file handle
-		fh.close()
-
-		; Return the list of plugin names
-		return found
 	}
 
 	getPluginsDir() {

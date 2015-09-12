@@ -1,10 +1,8 @@
-class UI_LV {
+class GUI_LV {
 	hwnd := 0
-	;ui := {}
 	schema := [] ; Column scheme
 
 	__New() {
-		;this.ui := ui
 	}
 
 	; Callback: must be a function object
@@ -19,6 +17,9 @@ class UI_LV {
 
 	setSchema(array) {
 		this.schema := array
+	}
+	getSchema() {
+		return this.schema
 	}
 
 	; Returns string of schema in header format

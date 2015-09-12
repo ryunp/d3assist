@@ -2,19 +2,16 @@
 ; Date: 08/24/15
 ; Version: 0.75.BETA.Mark2.theThird.twiceRemoved.Anal
 ; Licensing: #teamRyan
-; Description: A plugin manager. The plugins will help reduce common
-;   and repetitive tasks that cause high cognitive resource drain. I imagine
-;   this application like a character attribute: you gain varying -% CRD
-;   (Cognitive Resource Drain) for each plugins effectiveness.
 
 ;-------------------------------------------------------------------------------
-; DEPENDENCIES
+; DEPENDENCIES 
 ;-------------------------------------------------------------------------------
 #Include lib\utility.ahk
-#Include lib\log.ahk
+#Include lib\log_manager.ahk
 #Include lib\game_launcher.ahk
 #include lib\plugin_manager.ahk
-#include lib\ui.ahk
+#include lib\config_manager.ahk
+#include lib\app_window.ahk
 #include plugins.ahk
  
 ;-------------------------------------------------------------------------------
@@ -24,16 +21,23 @@
 
 ; Globals objects used throughout includes (I know; I cried as well)
 ;global api := new API()
-global log := new Log()
-global ui := new UI("Super Pooper 9000")
-global plugins := new Plugin_Manager()
+global logManager := new Log_Manager()
+global appWindow := new App_Window("Super Pooper 9000")
+global pluginManager := new Plugin_Manager()
+global configManager := new Config_Manager("pluginsConfig.json")
 global launcher := new Launcher()
 
 ; Initialization
-ui.init()
+appWindow.build()
 ;api.init()
-plugins.init()
-ui.populatePluginsList(plugins.getAll())
+pluginManager.loadAvailable()
+
+; Check for custom config
+if (custom := configManager.getPluginsConfig())
+		pluginManager.mergeConfig(custom)
+
+; Update window's plugin list contents
+appWindow.populatePluginsList(pluginManager.getList())
 
 ; Setup application menu
 setAppMenu()
@@ -42,8 +46,10 @@ setAppMenu()
 setSysTray()
 
 ; Dadoy
-ui.show()
+appWindow.show()
 
+
+OnExit("ExitFunc")
 ;-------------------------------------------------------------------------------
 return  ; AUTOEXEC END
 ;-------------------------------------------------------------------------------
@@ -52,11 +58,11 @@ return  ; AUTOEXEC END
 ; APP HOTKEYS 
 ;-------------------------------------------------------------------------------
 !1:: ; - show fukin GUI
-	ui.show()
+	appWindow.show()
 return
  
 !2:: ; - hide fukin GUI
-	ui.hide()
+	appWindow.hide()
 return
 
 !3:: ; - show Launcher
@@ -65,6 +71,7 @@ return
 
 !4:: ; - get ready to click play
 	launcher.show()
+	launcher.waitForWindow()
 	launcher.hoverPlayButton()
 return
 
@@ -72,14 +79,12 @@ return
 ~F12::ExitApp
 
 !5::
-	Launcher.play()
-	; StartD3() {
-	; 	CoordMode, mouse, Screen
-	; 	MouseGetPos, mX, mY
-	; 	launcher.play()
-	; 	;sleep 300
-	; 	MouseMove, mX, mY
-	; }
+	CoordMode, mouse, Screen
+	MouseGetPos, mX, mY
+	launcher.show()
+	launcher.waitForWindow()
+	launcher.hoverPlayButton()
+	MouseMove, mX, mY
 return
 
 setAppMenu() {
@@ -92,12 +97,15 @@ setAppMenu() {
 	Menu, MyMenuBar, Add, &Help, :HelpMenu
 	Gui, Menu, MyMenuBar
 }
+Exit:
+	ExitApp
+return
 
 ; Quick and dirty function down here, all alone. :(
 setSysTray() {
 	; Bind function to variable (object)
-	fnStart := ObjBindMethod(ui, "StartD3")
-	fnShow := ObjBindMethod(ui, "show")
+	fnStart := ObjBindMethod(appWindow, "StartD3")
+	fnShow := ObjBindMethod(appWindow, "show")
 
 	; Main SysTray Menu
 	Menu, tray, NoStandard				; Clear current standard menu items
@@ -122,9 +130,7 @@ menuAbout() {
 			. "ryunp")
 }
 
-MenuHandler:
-return
-
-Exit:
-	ExitApp
-return
+ExitFunc(ExitReason, ExitCode) {
+	configManager.setPluginsConfig()
+	; Do not call ExitApp -- that would prevent other OnExit functions from being called.
+}

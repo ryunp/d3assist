@@ -1,0 +1,1 @@
+Abstract: Application for automating a particular video game's trivial tasks. This app will aggregate AHK scripts and provide a graphic UI for the user to configure plugins configurations; such as setting activation hotkey, active status, and plugin specific settings.

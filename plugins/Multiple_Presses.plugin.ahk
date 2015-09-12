@@ -1,15 +1,12 @@
+; See Plugin_Template.ahk for information on how to build a plugin
+
 class Plugin_Multiple_Presses extends Plugin {
-	; See Plugin_Template.ahk for information on how to build a plugin
-
-	__New() {
-		; Plugin settings
-		settings := {name: "Multiple Presses"
-			, description: "Tracks multiple presses"
-			, hotkey: "^5"}
-
-		; This will overwrite the default plugin settings
-		base.updateSettings(settings)
-
+	name := "Multiple Presses"
+	description := "Tracks multiple presses"
+	hotkey := "^5"
+	configuration := {}
+	
+	run() {
 		; Define variables that you want to persist
 		this.pressCount := 0
 		this.pressesString := ["Single", "Double", "Tripple","Quadrupal","KILLER COMBO"]
@@ -19,9 +16,6 @@ class Plugin_Multiple_Presses extends Plugin {
 		this.callback := ObjBindMethod(this, "hMultipleActivations")
 		this.stats := ""
 		this.report := ""
-	}
-		
-	run() {
 		if (A_PriorHotkey != this.hotkey or A_TimeSincePriorHotkey > this.deltaMax) {
 		    ; First press of series
 		    KeyWait, % this.hotkey

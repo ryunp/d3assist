@@ -3,11 +3,11 @@
 ;   with JavaScript. So building some sort of architecture was a lot of
 ;   shooting from the hip. And ragefails. Yeehaw
 
-#include lib\UI_LV.ahk
+#include lib\gui_lv.ahk
 
-class UI {
+class App_Window {
 	; Instance vars
-	hwnd_main := 0
+	hwnd := 0
 	title := "ui"
 	LV_Plugins := {}
 
@@ -17,106 +17,77 @@ class UI {
 	}
 
 	; New UI and components
-	init() {
+	build() {
 		;;
 		; New GUI window
 		;;
-		Gui, New, +hwndhwnd, % this.title
-		this.hwndMain := hwnd
+		Gui, New, +hwndTMPHWND, % this.title
+		this.hwnd := TMPHWND
 
 		; Set properties
 		Gui, font, s9
 
 		; Game client actions
-		gui, add, button, +hwndhwnd Section, Open Launcher
-		setControlCallback(hwnd, launcher, launcher.show)
-		gui, add, button, +hwndhwnd ys, Start Diablo III
-		setControlCallback(hwnd, this, this.hStartD3)
-		gui, add, Button, +hwndhwnd ys, Plugins Dir
-		setControlCallback(hwnd, this, this.hOpenPluginsDir)
+		gui, add, button, +hwndTMPHWND Section, Open Launcher
+		setControlCallback(TMPHWND, launcher, launcher.show)
+		gui, add, button, +hwndTMPHWND ys, Start Diablo III
+		setControlCallback(TMPHWND, this, this.hStartD3)
+		gui, add, Button, +hwndTMPHWND ys, Plugins Dir
+		setControlCallback(TMPHWND, this, this.hOpenPluginsDir)
 
 		; ListView for plugin display
-		this.LV_Plugins := new UI_LV(this)
-		this.LV_Plugins.setSchema(["?", "Name", "Hotkey", "Description"])
+		this.LV_Plugins := new GUI_LV(this)
+		this.LV_Plugins.setSchema(["Active", "Name", "Hotkey", "Description"])
 		this.LV_Plugins.create("AltSubmit Section xs w500 r6")
 		this.LV_Plugins.setCallback(this, this.hLV_PluginsEvent)
 		
 		; Hotkey alteration components
-		Gui, add, button, +hwndhwnd Section, On/Off
-		setControlCallback(hwnd, this, this.hPluginToggle)
+		Gui, add, button, +hwndTMPHWND Section, On/Off
+		setControlCallback(TMPHWND, this, this.hPluginToggle)
 
 		Gui, add, text, ys, Hotkey:
-		Gui, add, hotkey, +hwndhwnd ys w150
-		this.hwndHotkeyInput := hwnd
+		Gui, add, hotkey, +hwndTMPHWND ys w150
+		this.hwndHotkeyInput := TMPHWND
 
-		Gui, add, button, +hwndhwnd ys, Apply
-		setControlCallback(hwnd, this, this.hHotkeyChange)
+		Gui, add, button, +hwndTMPHWND ys, Apply
+		setControlCallback(TMPHWND, this, this.hHotkeyChange)
 
 		; Reporting box (log window)
-		gui, add, Edit, +hwndhwnd xs w500 r3
-		log.setOutput(hwnd)
+		gui, add, Edit, +hwndTMPHWND xs w500 r3
+		logManager.setOutput(TMPHWND)
 	}
 
 	; Show the main GUI window
 	show() {
-		Gui, % this.hwndMain ":show"
+		Gui, % this.hwnd ":show"
 	}
 
 	; Hide the main GUI window
 	hide() {
-		Gui, % this.hwndMain ":hide"
+		Gui, % this.hwnd ":hide"
 	}
 
 	; Adds plugins to ListView
 	; @param pluginList Array List of plugin objects to add
 	populatePluginsList(pluginList) {
+		LV_delete()
+		
 		for i, plugin in pluginList {
-			this.LV_Plugins.addRow([plugin.active, plugin.name, plugin.hotkey, plugin.description])
+			cols := []
+
+			for i, item in this.LV_Plugins.getSchema()
+				cols.push(plugin[item])
+
+			this.LV_Plugins.addRow(cols)
 		}
 
 		; Adjust cell widths
 		this.LV_Plugins.updatePadding()
 	}
 
-	; Update row data
-	; @param row Array Column data to update
-	updateAll() {
-		; Get list view info
-		rows := LV_GetCount()
-		cols := LV_GetCount("Column")
-
-		; Iterate over rows
-		loop, % rows
-		{
-			; Save current row
-			curRow := A_Index
-
-			; Get plugin name of row
-			LV_GetText(pName, A_Index, 2)
-
-			; Pull correct plugin for comparison
-			plugin := plugins.get(pName)
-
-			; Save a col scheme array for comparison
-			pluginCols := [plugin.active, plugin.name, plugin.hotkey, plugin.description]
-
-			; Go through each column
-			loop, % cols
-			{
-				; Get the data for current column
-				LV_GetText(field, curRow, A_Index )
-				
-				; Compare to plugin's data
-				if not (field = pluginCols[A_Index]) {
-					;msgbox % "Found change in " plugin.name "`r`n" . "col: " A_Index "`r`n" . "registry: " pluginCols[A_Index] "`r`n" . "view: " field
-					LV_Modify(curRow, "Col" A_Index, pluginCols[A_Index])
-				}
-			}
-		}
-	}
 
 	;---------------------------------------------------------------------------
-	; Callback Handlers
+	; Callback Handlers ( COUPLING WITH PLUGIN MANAGER )
 	;---------------------------------------------------------------------------
 
 	hStartD3() {
@@ -127,9 +98,8 @@ class UI {
 		MouseMove, mX, mY
 	}
 
-	; COUPLING DETECTED
 	hOpenPluginsDir() {
-		run, % "explorer " A_ScriptDir "\" plugins.getPluginsDir()
+		run, % "explorer " A_ScriptDir "\" pluginManager.getPluginsDir()
 	}
 	
 	hHotkeyChange() {
@@ -142,7 +112,7 @@ class UI {
 
 		; Only change if different
 		if not (curHK = inHK) {
-			plugins.updateHotkey(pName, inHK)
+			pluginManager.updateHotkey(pName, inHK)
 			this.LV_Plugins.updateCol(row, 3, inHK)
 		}
 	}
@@ -157,7 +127,7 @@ class UI {
 			;msgbox % A_thisfunc ": " row ", "  pName ", " pActive
 
 			; Toggle active
-			plugins.toggle(pName)
+			pluginManager.toggle(pName)
 
 			; Update LV
 			this.LV_Plugins.updateCol(row, 1, !pActive)

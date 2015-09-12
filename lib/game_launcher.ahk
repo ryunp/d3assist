@@ -129,11 +129,16 @@ class Launcher {
 
 	hoverPlayButton() {
 		CoordMode, mouse, Screen
+
 		; Get window info
 		WinGetPos,X,Y,W,H, % this.winTitle
 
 		; Move mouse to the Play button
 		MouseMove, X + 300, % Y + H - 65
+	}
+
+	waitForWindow() {
+		WinWaitActive, % this.winTitle
 	}
 
 	__Call(method, args*) {

@@ -5,10 +5,11 @@
 
 class Plugin {
 	; Default settings
-	settings := {name: "Plugin Template"
-		, description: "Abstract class for building a plugin"
-		, hotkey: "/dev/null"
-		, active: 0}
+	name := "Plugin Template"
+	description := "Abstract class for building a plugin"
+	hotkey := "/dev/null"
+	active := 0
+	configuration := {}
 
 	; Each plugin should create their own run() function which will be
 	; be called on hotkey activation
@@ -18,35 +19,47 @@ class Plugin {
 
 	; Updates state
 	enable() {
-		this.settings.active := 1
+		this.active := 1
 	}
 	disable() {
-		this.settings.active := 0
+		this.active := 0
 	}
 
+	getName() {
+		return this.name
+	}
+	setName(name) {
+		this.name := name
+	}
+
+	getDescription() {
+		return this.description
+	}
+	setDescription(text) {
+		this.description := text
+	}
+
+	getHotkey() {
+		return this.hotkey
+	}
 	setHotkey(key) {
-		this.settings.hotkey := key
+		this.hotkey := key
 	}
 
-	; Only update keys that exist in base settings
-	updateSettings(settings) {
-		for k,v in settings
-			if this.settings.HasKey(k)
-				this.settings[k] := v
+	getActive() {
+		return this.active
+	}
+	setActive(state) {
+		this.active := state
+	}
+
+	getConfiguration() {
+		return this.configuration
 	}
 	
-	; Return a string of all plugin settings
-	printSettings() {
-		str := ""
-		for k,v in this.settings
-			str .= k " = " v "`r`n"
-		return substr(str, 1, -2)
-	}
-
 	; Constructor !This should not be instantiated!
-	__New(settings) {
-		msgbox % "Nope.avi, Goodbye"
-		ExitApp
+	__New() {
+		;something
 	}
 
 	; Not calling functions directly, do not need?. REMOVE? TEST!
@@ -62,20 +75,10 @@ class Plugin {
 		}
 	}
 
-	; @help: Meta-Function
-	; Proxy use of GETTING <plugin>.settings.X to <plugin>.X
-	__Get(key) {
-		if (this.settings.HasKey(key))
-			return this.settings[key]
-	}
-
-	; @help: Dynamic Properties
-	; Proxy use of SETTING <plugin>.settings.hotkey to <plugin>.hotkey
-
 	; Callbacks (hotkey,timer, etc) call this function implicitly
 	; Using as abstract proxy for the custom plugin's functionality
 	Call() {
-		log.add(this.settings.name " used")
+		log.add(this.name " used")
 		this.run()
 	}
 

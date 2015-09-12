@@ -1,4 +1,4 @@
-class Log {
+class Log_Manager {
 	logbook := []
 	output := {}
 
@@ -25,12 +25,12 @@ class Log {
 	; Add entry to control displaying the data
 	updateLogDisplay(entry) {
 		; Format timestamp
-		FormatTime, timstamp, % entry.timestamp, HH:mm:ss
+		FormatTime, timestamp, % entry.timestamp, HH:mm:ss
 
 		; Grab current logbuffer
 		GuiControlGet, data,, % this.output
 
 		; Append latest entry to top
-		GuiControl, , % this.output, % "[" timstamp "] " entry.text "`r`n" data 
+		GuiControl, , % this.output, % "[" timestamp "] " entry.text "`r`n" data 
 	}
 }
