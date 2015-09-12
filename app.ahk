@@ -24,7 +24,7 @@
 global logManager := new Log_Manager()
 global appWindow := new App_Window("Super Pooper 9000")
 global pluginManager := new Plugin_Manager()
-global configManager := new Config_Manager("pluginsConfig.json")
+global configManager := new Config_Manager("plugins.config.json")
 global launcher := new Launcher()
 
 ; Initialization
