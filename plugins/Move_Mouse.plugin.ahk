@@ -42,7 +42,6 @@ class Plugin_Move_Mouse extends Plugin {
 	}
 
 	hCancel() {
-		TrayTip, alert, putting values back
 		this.settingWindow.hide()
 	}
 }

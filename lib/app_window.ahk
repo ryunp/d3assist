@@ -147,7 +147,6 @@ class App_Window {
 		    	; "A" = double click
   				this.hPluginToggle()
 		  	} else if (A_GuiEvent = "RightClick") {
-				traytip, ALTERT, % pName
 		        pluginManager.get(pName).settingWindow.show()
 		    }		    
 		}
