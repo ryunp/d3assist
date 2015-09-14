@@ -1,8 +1,3 @@
-; UI's are a real pain to deal with when trying to objectify functionality.
-;   Callbacks can get really messed up, just look at all the issues people have
-;   with JavaScript. So building some sort of architecture was a lot of
-;   shooting from the hip. And ragefails. Yeehaw
-
 #include lib\gui_lv.ahk
 
 class App_Window {
@@ -36,7 +31,7 @@ class App_Window {
 		setControlCallback(TMPHWND, this, this.hOpenPluginsDir)
 
 		; ListView for plugin display
-		this.LV_Plugins := new GUI_LV(this)
+		this.LV_Plugins := new GUI_LV(this.hwnd)
 		this.LV_Plugins.setSchema(["Active", "Name", "Hotkey", "Description"])
 		this.LV_Plugins.create("AltSubmit Section xs w500 r6")
 		this.LV_Plugins.setCallback(this, this.hLV_PluginsEvent)
@@ -152,7 +147,8 @@ class App_Window {
 		    	; "A" = double click
   				this.hPluginToggle()
 		  	} else if (A_GuiEvent = "RightClick") {
-		        ;show context menu
+				traytip, ALTERT, % pName
+		        pluginManager.get(pName).settingWindow.show()
 		    }		    
 		}
 	}

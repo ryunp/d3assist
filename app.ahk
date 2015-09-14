@@ -12,6 +12,7 @@
 #include lib\plugin_manager.ahk
 #include lib\config_manager.ahk
 #include lib\app_window.ahk
+#include lib\pluginsetting_window.ahk
 #include plugins.ahk
  
 ;-------------------------------------------------------------------------------
@@ -88,6 +89,7 @@ return
 return
 
 setAppMenu() {
+	gui, % appWindow.hwnd ":default"
 	Menu, FileMenu, Add, E&xit, Exit
 
 	fn := func("menuAbout")
@@ -97,9 +99,7 @@ setAppMenu() {
 	Menu, MyMenuBar, Add, &Help, :HelpMenu
 	Gui, Menu, MyMenuBar
 }
-Exit:
-	ExitApp
-return
+
 
 ; Quick and dirty function down here, all alone. :(
 setSysTray() {
@@ -134,3 +134,7 @@ ExitFunc(ExitReason, ExitCode) {
 	configManager.setPluginsConfig()
 	; Do not call ExitApp -- that would prevent other OnExit functions from being called.
 }
+
+Exit:
+	ExitApp
+return

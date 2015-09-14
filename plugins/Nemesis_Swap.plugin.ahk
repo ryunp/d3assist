@@ -13,4 +13,8 @@ class Plugin_Nemesis_Swap extends Plugin {
 	localFunc() {
 		return "waaaaaaat"
 	}
+
+	; buildSettingsWindow() {
+		
+	; }
 }

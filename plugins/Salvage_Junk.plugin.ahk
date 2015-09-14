@@ -9,4 +9,8 @@ class Plugin_Salvage_Junk extends Plugin {
 	run() {
 		msgbox % this.name " placeholder action!"
 	}
+
+	; buildSettingsWindow() {
+		
+	; }
 }

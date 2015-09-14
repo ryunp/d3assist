@@ -9,4 +9,8 @@ class Plugin_Repair_Gear extends Plugin {
 	run() {
 		msgbox % this.name " placeholder action!"
 	}
+
+	; buildSettingsWindow() {
+		
+	; }
 }

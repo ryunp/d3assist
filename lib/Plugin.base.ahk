@@ -10,12 +10,27 @@ class Plugin {
 	hotkey := "/dev/null"
 	active := 0
 	configuration := {}
+	settingWindow := {}
+
+	; Constructor
+	__New() {
+		this.settingWindow := new PluginSetting_Window(this)
+		this.buildSettingsWindow()
+		;this.settingWindow.show()
+	}
 
 	; Each plugin should create their own run() function which will be
-	; be called on hotkey activation
+	; be called on hotkey usage
 	run() {
-		msgbox % "Plugin did not correctly override the " A_ThisFunc "() method"
+		; OVERRIDE ME
 	}
+	
+	; Custom settings UI for each plugin to create
+	buildSettingsWindow() {
+		Gui, add, edit, r5 w400 h400, This is some default stuff
+	}
+
+
 
 	; Updates state
 	enable() {
@@ -55,11 +70,6 @@ class Plugin {
 
 	getConfiguration() {
 		return this.configuration
-	}
-	
-	; Constructor !This should not be instantiated!
-	__New() {
-		;something
 	}
 
 	; Not calling functions directly, do not need?. REMOVE? TEST!

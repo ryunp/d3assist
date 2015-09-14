@@ -1,12 +1,15 @@
 class GUI_LV {
 	hwnd := 0
 	schema := [] ; Column scheme
+	parentHwnd := 0
 
-	__New() {
+	__New(hwnd) {
+		this.parentHwnd := hwnd
 	}
 
 	; Callback: must be a function object
 	create(options) {
+		Gui, % this.parentHwnd ":default"
 		Gui, Add, ListView, % "+hwndhwnd " options, % this.getHeader()
 		this.hwnd := hwnd
 	}
@@ -39,6 +42,7 @@ class GUI_LV {
 	}
 
 	getFocused() {
+		this.setControlFocus()
 		return LV_GetNext("F")
 	}
 
@@ -61,6 +65,7 @@ class GUI_LV {
 
 	; Removes specified row
 	removeRow(row) {
+		this.setControlFocus()
 		LV_Delete(row)
 	}
 
@@ -79,11 +84,13 @@ class GUI_LV {
 
 	; Remove all listed items
 	clear() {
+		this.setControlFocus()
 		LV_Delete()
 	}
 
 	; Set the target of the next ui actions
 	setControlFocus() {
+		gui, % this.parentHwnd ":default"
 		Gui, ListView, % this.hwnd
 	}
 }

@@ -5,6 +5,7 @@ class Plugin_Move_Mouse extends Plugin {
 	description := "Simply move the mouse from left to right"
 	hotkey := "^4"
 	configuration := {"speed": 50}
+	settingWindow := {}
 	
 	run() {
 		; Set coord relativity
@@ -15,5 +16,33 @@ class Plugin_Move_Mouse extends Plugin {
 
 		; Go to middle right
 		MouseMove, % A_ScreenWidth, % A_ScreenHeight/2, % this.configuration.speed
+	}
+
+	buildSettingsWindow() {
+		gui, % this.settingWindow.hwnd ":Default"
+
+		Gui, add, text, section, Speed:
+		Gui, add, edit, +hwndTMPHWND ys, % this.configuration.speed
+		this.hControl_speed := TMPHWND
+		
+		gui, add, button, +hwndTMPHWND section xs, Save
+		fn := ObjBindMethod(this, "hSave")
+		GuiControl +g, % TMPHWND, % fn
+
+		gui, add, button, +hwndTMPHWND ys, Cancel
+		fn := ObjBindMethod(this, "hCancel")
+		GuiControl +g, % TMPHWND, % fn
+	}
+
+	hSave() {
+		GuiControlGet, speed, , % this.hControl_speed
+		this.configuration.speed := speed
+		logManager.add(this.name " settings adjusted")
+		this.settingWindow.hide()
+	}
+
+	hCancel() {
+		TrayTip, alert, putting values back
+		this.settingWindow.hide()
 	}
 }

@@ -1,5 +1,3 @@
-; Replies on base plugin class to be iherited for usage. Prototyping more so.
-
 #include lib/plugin_loader.ahk
 
 class Plugin_Manager {
@@ -16,6 +14,8 @@ class Plugin_Manager {
 		loader := new Plugin_Loader(this.pluginsFile)
 		for i, plugin in loader.getPlugins() {
 			this.collection[plugin.name] := plugin
+
+			plugin.settingWindow.setParent(appWindow.hwnd)
 
 			; Set plugin's API reference
 			;plugin.setAPI(api)

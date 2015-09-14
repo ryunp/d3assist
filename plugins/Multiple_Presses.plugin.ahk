@@ -77,4 +77,8 @@ class Plugin_Multiple_Presses extends Plugin {
 	clearTT() {
 		tooltip
 	}
+
+	; buildSettingsWindow() {
+		
+	; }
 }
