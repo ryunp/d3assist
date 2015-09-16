@@ -21,6 +21,7 @@ class Plugin_SettingsWindow {
 	}
 
 	show() {
+		this.updateControls()
 		Gui, % this.hwnd ":show"
 	}
 
@@ -76,6 +77,10 @@ class Plugin_SettingsWindow {
 		GuiControl +g, % control, % fn
 	}
 
+	updateControls() {
+		for setting, hwnd in this.inputControls
+			GuiControl, , % hwnd, % this.plugin.getSetting(setting)
+	}
 
 	hSave() {
 		updated := []
