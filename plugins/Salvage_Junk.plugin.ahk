@@ -4,7 +4,6 @@ class Plugin_Salvage_Junk extends Plugin {
 	name := "Salvage Junk"
 	description := "Salvages white, blue, yellow items"
 	hotkey := "^3"
-	configuration := {}
 	
 	run() {
 		msgbox % this.name " placeholder action!"

@@ -14,7 +14,7 @@ setControlCallback(control, self, function) {
         split := StrSplit(function.name, ".")
         fn := ObjBindMethod(self, split.pop())
     } else if StrLen(function) {
-        ; function passes is a string
+        ; function passes is a string - global scope function
         ; Explicitly pass reference to UI (parameter of function)
         fn := func(function).bind(self)
     }

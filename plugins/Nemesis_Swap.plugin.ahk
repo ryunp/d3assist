@@ -4,7 +4,6 @@ class Plugin_Nemesis_Swap extends Plugin {
 	name := "Nemesis Swap"
 	description := "Swaps Nemesis bracers"
 	hotkey := "^1"
-	configuration := {}
 
 	run() {
 		msgbox % this.name " placeholder action! " this.localFunc()
@@ -14,7 +13,4 @@ class Plugin_Nemesis_Swap extends Plugin {
 		return "waaaaaaat"
 	}
 
-	; buildSettingsWindow() {
-		
-	; }
 }

@@ -21,6 +21,7 @@ class GUI_LV {
 	setSchema(array) {
 		this.schema := array
 	}
+
 	getSchema() {
 		return this.schema
 	}
@@ -28,16 +29,13 @@ class GUI_LV {
 	; Returns string of schema in header format
 	getHeader() {
 		header := ""
-
 		for i, col in this.schema
-			header .= col "|"
-
-		return SubStr(header, 1, -1)
+			header .= (A_Index-1 ? "|" : "") col 
+		return header
 	}
 
 	getNextSelected(row:=0) {
 		this.setControlFocus()
-
 		return LV_GetNext(row)
 	}
 
@@ -48,41 +46,31 @@ class GUI_LV {
 
 	GetText(row, col) {
 		this.setControlFocus()
-
 		LV_GetText(text, row, col)
-
 		return text
 	}
 	
 	; Take an array and pass as variadic parameters (flatten into args)
-	; @param cols Array of column data: []
 	addRow(cols) {
 		this.setControlFocus()
-
-		; Add column data (flatten array into args)
 		LV_Add("", cols*)
 	}
 
-	; Removes specified row
 	removeRow(row) {
 		this.setControlFocus()
 		LV_Delete(row)
 	}
 
-	; Update a specific column
 	updateCol(row, col, val) {
 		this.setControlFocus()
-
 		LV_Modify(row, "Col" col, val)
 	}
 
 	updatePadding() {
 		this.setControlFocus()
-
 		LV_ModifyCol()
 	}
 
-	; Remove all listed items
 	clear() {
 		this.setControlFocus()
 		LV_Delete()

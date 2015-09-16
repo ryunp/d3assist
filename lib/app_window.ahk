@@ -1,21 +1,16 @@
 #include lib\gui_lv.ahk
 
 class App_Window {
-	; Instance vars
 	hwnd := 0
 	title := "ui"
 	LV_Plugins := {}
 
-	; Constructor
 	__New(name) {
 		this.title := name
 	}
 
-	; New UI and components
-	build() {
-		;;
+	create() {
 		; New GUI window
-		;;
 		Gui, New, +hwndTMPHWND, % this.title
 		this.hwnd := TMPHWND
 
@@ -39,11 +34,9 @@ class App_Window {
 		; Hotkey alteration components
 		Gui, add, button, +hwndTMPHWND Section, On/Off
 		setControlCallback(TMPHWND, this, this.hPluginToggle)
-
 		Gui, add, text, ys, Hotkey:
 		Gui, add, hotkey, +hwndTMPHWND ys w150
 		this.hwndHotkeyInput := TMPHWND
-
 		Gui, add, button, +hwndTMPHWND ys, Apply
 		setControlCallback(TMPHWND, this, this.hHotkeyChange)
 
@@ -52,37 +45,32 @@ class App_Window {
 		logManager.setOutput(TMPHWND)
 	}
 
-	; Show the main GUI window
 	show() {
 		Gui, % this.hwnd ":show"
 	}
 
-	; Hide the main GUI window
 	hide() {
 		Gui, % this.hwnd ":hide"
 	}
 
-	; Adds plugins to ListView
-	; @param pluginList Array List of plugin objects to add
-	populatePluginsList(pluginList) {
-		LV_delete()
-		
-		for i, plugin in pluginList {
-			cols := []
+	getHwnd() {
+		return this.hwnd
+	}
 
+	setPluginsLV() {
+		LV_delete()
+		for i, plugin in pluginManager.getList() {
+			cols := []
 			for i, item in this.LV_Plugins.getSchema()
 				cols.push(plugin[item])
-
 			this.LV_Plugins.addRow(cols)
 		}
-
-		; Adjust cell widths
 		this.LV_Plugins.updatePadding()
 	}
 
 
 	;---------------------------------------------------------------------------
-	; Callback Handlers ( COUPLING WITH PLUGIN MANAGER )
+	; Callback Handlers
 	;---------------------------------------------------------------------------
 
 	hStartD3() {
@@ -101,53 +89,48 @@ class App_Window {
 		row := this.LV_Plugins.getNextSelected()
 
 		; Get the hotkey input, plugin name
-		GuiControlGet, inHK, , % this.hwndHotkeyInput
-		pName := this.LV_Plugins.getText(row, 2)
-		curHK := this.LV_Plugins.getText(row, 3)
+		GuiControlGet, hotkeyInput, , % this.hwndHotkeyInput
+		nameLV := this.LV_Plugins.getText(row, 2)
+		hotkeyLV := this.LV_Plugins.getText(row, 3)
 
 		; Only change if different
-		if not (curHK = inHK) {
-			pluginManager.updateHotkey(pName, inHK)
-			this.LV_Plugins.updateCol(row, 3, inHK)
+		if not (hotkeyLV = hotkeyInput) {
+			pluginManager.updateHotkey(nameLV, hotkeyInput)
+			this.LV_Plugins.updateCol(row, 3, hotkeyInput)
 		}
 	}
 
 	hPluginToggle() {
 		row := this.LV_Plugins.getNextSelected()
 		while (row) {
-			; Gather plugin active state and name
-			pActive := this.LV_Plugins.getText(row, 1)
-			pName := this.LV_Plugins.getText(row, 2)
+			activeLV := this.LV_Plugins.getText(row, 1)
+			nameLV := this.LV_Plugins.getText(row, 2)
 
-			;msgbox % A_thisfunc ": " row ", "  pName ", " pActive
-
-			; Toggle active
-			pluginManager.toggle(pName)
-
-			; Update LV
-			this.LV_Plugins.updateCol(row, 1, !pActive)
-
+			pluginManager.toggle(nameLV)
+			this.LV_Plugins.updateCol(row, 1, !activeLV)
 			row := this.LV_Plugins.getNextSelected(row)
 		}
 	}
 
-	hLV_PluginsEvent() {
-		; Check for focused item	  	
+	hLV_PluginsEvent() {  	
 	  	if (row := this.LV_Plugins.getFocused()) {
-	  		; Get row info
-			pActive := this.LV_Plugins.getText(row, 1)
-  			pName := this.LV_Plugins.getText(row, 2)
-  			pHK := this.LV_Plugins.getText(row, 3)
+	  		; Get selection info
+			activeLV := this.LV_Plugins.getText(row, 1)
+  			nameLV := this.LV_Plugins.getText(row, 2)
+  			hotkeyLV := this.LV_Plugins.getText(row, 3)
   			
-  			; Respond to event
+  			; Respond to events
 		  	if (A_GuiEvent = "c") {
 		  		; "c" = click
-	  			GuiControl, , % this.hwndHotkeyInput, % pHK
+	  			GuiControl, , % this.hwndHotkeyInput, % hotkeyLV
+
 	  		} else if (A_GuiEvent = "A") {
 		    	; "A" = double click
   				this.hPluginToggle()
+
 		  	} else if (A_GuiEvent = "RightClick") {
-		        pluginManager.get(pName).settingWindow.show()
+		        pluginManager.get(nameLV).showSettingsWindow()
+
 		    }		    
 		}
 	}

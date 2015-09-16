@@ -40,7 +40,10 @@ class json {
 	    return RTrim(ToReturn, NewRow)
 	}
 	
-	write( obj ) { ;_json_fromobj
+	write( obj ) {
+		return this.fromObj( obj )
+	}
+	fromObj( obj ) { ;_json_fromobj
 
 		If IsObject( obj )
 		{
@@ -84,7 +87,10 @@ class json {
 	} ; this.write( obj )
 
 	; Uses a two-pass iterative approach to deserialize a json string
-	read( str ) { ;_json_toobj
+	read( str ) {
+		return this.toObj( str )
+	}
+	toObj( str ) { ;_json_toobj
 
 		quot := """" ; firmcoded specifically for readability. Hardcode for (minor) performance gain
 		ws := "`t`n`r " Chr(160) ; whitespace plus NBSP. This gets trimmed from the markup

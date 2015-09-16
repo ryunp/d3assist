@@ -4,7 +4,6 @@ class Plugin_Multiple_Presses extends Plugin {
 	name := "Multiple Presses"
 	description := "Tracks multiple presses"
 	hotkey := "^5"
-	configuration := {}
 	
 	run() {
 		; Define variables that you want to persist
