@@ -13,7 +13,7 @@ lines := "; Note: This file is dynamically created on every bootup.`r`n`r`n"
 	. "; Template for all plugins (required for plugin inheritance)`r`n"
 
 ; First add the plugin template
-lines .= "#Include lib\plugin.base.ahk`r`n`r`n"
+lines .= "#Include src\plugin.base.ahk`r`n`r`n"
 
 ; Second add all the plugins themselves
 lines .= "; Dynamically loaded plugins:`r`n"

@@ -53,7 +53,7 @@ appWindow.setPluginsLV()
 setAppMenu()
 setSysTray()
 appWindow.show()
-msgbox % game.launcher.getInfo()
+;msgbox % game.launcher.getInfo()
 
 
 OnExit, ExitAction
