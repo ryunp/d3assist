@@ -1,9 +1,9 @@
 class Plugin_SettingsWindow {
+	title := ""
 	hwnd := 0
 	parentHwnd := 0
-	title := ""
 	plugin := {}
-	inputControls := {}
+	settingsControls := {}
 
 	__New(plugin) {
 		this.plugin := plugin
@@ -22,7 +22,10 @@ class Plugin_SettingsWindow {
 
 	show() {
 		this.updateControls()
-		Gui, % this.hwnd ":show"
+		CoordMode, Mouse, Screen
+		MouseGetPos, mX, mY
+		Gui, % this.hwnd ":show", % "X" mX " Y" mY
+		GuiControl, Focus, % this.cancelBtn
 	}
 
 	hide() {
@@ -30,8 +33,8 @@ class Plugin_SettingsWindow {
 	}
 
 	create() {
-		Gui, New, +hwndTMPHWND ToolWindow, % this.title
-		this.hwnd := TMPHWND
+		Gui, New, +hwndhwnd ToolWindow -Caption +Border, % this.title
+		this.hwnd := hwnd
 	}
 
 	addEditBox(label, setting) {
@@ -42,7 +45,7 @@ class Plugin_SettingsWindow {
 		hwnd := this.addControl("edit", "ys", this.plugin.getSetting(setting))
 
 		; Save input box handle reference
-		this.inputControls[setting] := hwnd
+		this.settingsControls[setting] := {"hwnd": hwnd, "label": label}
 
 		this.addControl("text", "ys", this.plugin.getSettingDescription(setting))
 	}
@@ -64,9 +67,11 @@ class Plugin_SettingsWindow {
 	addFooter() {
 		hwnd := this.addControl("button", "section xs", "Save")
 		this.addControlCallback(hwnd, "hSave")
+		this.saveBtn := hwnd
 
 		hwnd := this.addControl("button", "ys", "Cancel")
 		this.addControlCallback(hwnd, "hCancel")
+		this.cancelBtn := hwnd
 	}
 
 	addControlCallback(control, function) {
@@ -78,24 +83,25 @@ class Plugin_SettingsWindow {
 	}
 
 	updateControls() {
-		for setting, hwnd in this.inputControls
-			GuiControl, , % hwnd, % this.plugin.getSetting(setting)
+		for setting, keys in this.settingsControls
+			GuiControl, , % keys.hwnd, % this.plugin.getSetting(setting)
 	}
 
 	hSave() {
 		updated := []
 		; gather all input control data to merge back into plugin's settings
-		for setting, hwnd in this.inputControls {
-			GuiControlGet, value, , % hwnd
+		for setting, keys in this.settingsControls {
+			GuiControlGet, value, , % keys.hwnd
 			if (value != this.plugin.getSetting(setting)) {
 				this.plugin.setSetting(setting, value)
 				updated.push(setting)
 			}
 		}
-		for i,v in updated
-			str .= (A_Index-1 ? ", " : "" ) v
+		for i,setting in updated
+			str .= (A_Index-1 ? ", " : "" ) this.settingsControls[setting].label
 
-		logManager.add(this.plugin.getName() " updated: " str)
+		if str
+			logManager.add(this.plugin.getName() " updated: " str)
 
 		this.hide()
 	}

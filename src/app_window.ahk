@@ -1,4 +1,4 @@
-#include lib\gui_lv.ahk
+#include gui_lv.ahk
 
 class App_Window {
 	hwnd := 0
@@ -19,7 +19,7 @@ class App_Window {
 
 		; Game client actions
 		gui, add, button, +hwndTMPHWND Section, Open Launcher
-		setControlCallback(TMPHWND, launcher, launcher.show)
+		setControlCallback(TMPHWND, this, this.hOpenLauncher)
 		gui, add, button, +hwndTMPHWND ys, Start Diablo III
 		setControlCallback(TMPHWND, this, this.hStartD3)
 		gui, add, Button, +hwndTMPHWND ys, Plugins Dir
@@ -34,10 +34,7 @@ class App_Window {
 		; Hotkey alteration components
 		Gui, add, button, +hwndTMPHWND Section, On/Off
 		setControlCallback(TMPHWND, this, this.hPluginToggle)
-		Gui, add, text, ys, Hotkey:
-		Gui, add, hotkey, +hwndTMPHWND ys w150
-		this.hwndHotkeyInput := TMPHWND
-		Gui, add, button, +hwndTMPHWND ys, Apply
+		Gui, add, button, +hwndTMPHWND ys, Change Hotkey
 		setControlCallback(TMPHWND, this, this.hHotkeyChange)
 
 		; Reporting box (log window)
@@ -76,9 +73,12 @@ class App_Window {
 	hStartD3() {
 		CoordMode, mouse, Screen
 		MouseGetPos, mX, mY
-		launcher.play()
+		game.launcher.play()
 		sleep 300
 		MouseMove, mX, mY
+	}
+	hOpenLauncher() {
+		game.launcher.show()
 	}
 
 	hOpenPluginsDir() {
@@ -87,9 +87,14 @@ class App_Window {
 	
 	hHotkeyChange() {
 		row := this.LV_Plugins.getNextSelected()
+		if not row
+			return
 
 		; Get the hotkey input, plugin name
-		GuiControlGet, hotkeyInput, , % this.hwndHotkeyInput
+		hotkeyInput := HotkeyGUI(this.hwnd, , , True)
+		if not hotkeyInput
+			return
+			
 		nameLV := this.LV_Plugins.getText(row, 2)
 		hotkeyLV := this.LV_Plugins.getText(row, 3)
 

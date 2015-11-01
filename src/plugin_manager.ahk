@@ -1,10 +1,10 @@
 class Plugin_Manager {
 	pluginsDir := "plugins"
 	pluginsFile := "plugins.ahk"
-	plugins := {}
+	pluginList := {}
 
 	get(name) {
-		return this.plugins[name]
+		return this.pluginList[name]
 	}
 
 	enable(name) {
@@ -15,14 +15,14 @@ class Plugin_Manager {
 	}
 
 	disable(name) {
-		plugin := this.plugins[name]
+		plugin := this.pluginList[name]
 		plugin.disable()
 		hotkey, % plugin.getHotkey(), Off
 		logManager.add(plugin.getName() " disabled")
 	}
 
 	toggle(name) {
-		if (this.plugins[name].active)
+		if (this.pluginList[name].active)
 			this.disable(name)
 		else
 			this.enable(name)
@@ -30,7 +30,7 @@ class Plugin_Manager {
 
 	getList() {
 		list := []
-		for k, plugin in this.plugins
+		for k, plugin in this.pluginList
 			list.push(plugin)
 		return list
 	}
@@ -40,7 +40,7 @@ class Plugin_Manager {
 	}
 
 	updateHotkey(name, key) {
-		plugin := this.plugins[name]
+		plugin := this.pluginList[name]
 
 		logManager.add(plugin.getName() " hotkey updated from " plugin.getHotkey() " to " key)
 
@@ -57,8 +57,7 @@ class Plugin_Manager {
 
 		for i, className in loader.getPluginClasses() {
 			plugin := new %className%
-			this.plugins[plugin.getName()] := plugin
-			plugin.setSettingsWindowParent(appWindow.hwnd)
+			this.pluginList[plugin.getName()] := plugin
 		}
 	}
 }

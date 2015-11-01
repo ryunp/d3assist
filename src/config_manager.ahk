@@ -1,9 +1,9 @@
-#include lib/json_parser.ahk
+#include json_parser.ahk
 
 class Config_Manager {
 	buffer := {}
-	json := new json()
-
+	file := ""
+	
 	__New(file) {
 		this.file := file
 	}

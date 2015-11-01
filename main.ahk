@@ -6,41 +6,57 @@
 ;-------------------------------------------------------------------------------
 ; DEPENDENCIES 
 ;-------------------------------------------------------------------------------
-#Include lib\utility.ahk
-#Include lib\game_launcher.ahk
-#include lib\plugin_loader.ahk
-#include lib\plugin_settings.ahk
-#include lib\plugin_settingsWindow.ahk
-#include lib\plugin_manager.ahk
-#include lib\config_manager.ahk
-#Include lib\log_manager.ahk
-#include lib\app_window.ahk
+; Set dir \src
+#Include %A_ScriptDir%\src
+#include plugin_loader.ahk
+#include plugin_settings.ahk
+#include plugin_settingsWindow.ahk
+#include plugin_manager.ahk
+#include config_manager.ahk
+#Include log_manager.ahk
+#include app_window.ahk
+
+; Set dir \lib
+#Include %A_ScriptDir%\lib
+#Include utility.ahk
+#include HotkeyGUI2.ahk
+
+; Set dir \api
+#Include %A_ScriptDir%\api
+#Include game_d3.ahk
+;#Include launcher_bnet.ahk
+
+; Set dir back to root
+#include %A_ScriptDir%
 #include plugins.ahk
  
 
 ;-------------------------------------------------------------------------------
 ; SETUP ENVIRONMENT
 ;-------------------------------------------------------------------------------
-;SetTitleMatchMode, Regex ; Need for case-insensitive searches via 'i)'
+SetTitleMatchMode, Regex ; Need for case-insensitive searches via 'i)'
+CoordMode, mouse, Screen
 
-; Globals objects used throughout includes (I know; I cried as well)
-;global api := new API()
+; Globals objects
 global logManager := new Log_Manager()
 global appWindow := new App_Window("Super Pooper 9000")
 global pluginManager := new Plugin_Manager()
 global configManager := new Config_Manager("plugins.config.json")
-global launcher := new Launcher()
+global game := new Game_D3()
+;global launcher := new Launcher_BNet("Diablo III")
 
-
+; Initializations
+appWindow.create() 
 pluginManager.loadAvailable()
-configManager.load()
-appWindow.create()
+configManager.load() 
 appWindow.setPluginsLV()
 setAppMenu()
 setSysTray()
-
 appWindow.show()
-OnExit, Exit
+msgbox % game.launcher.getInfo()
+
+
+OnExit, ExitAction
 ;-------------------------------------------------------------------------------
 return  ; AUTOEXEC END
 ;-------------------------------------------------------------------------------
@@ -57,13 +73,11 @@ return
 return
 
 !3:: ; - show Launcher
-	launcher.show()
+	game.launcher.show()
 return
 
 !4:: ; - get ready to click play
-	launcher.show()
-	launcher.waitForWindow()
-	launcher.hoverPlayButton()
+	game.launcher.selectPlayButton()
 return
 
 ; F12 - Quit program
@@ -72,15 +86,18 @@ return
 !5::
 	CoordMode, mouse, Screen
 	MouseGetPos, mX, mY
-	launcher.show()
-	launcher.waitForWindow()
-	launcher.hoverPlayButton()
+	game.launcher.show()
+	game.launcher.selectPlayButton()
 	MouseMove, mX, mY
+return
+
+^LButton::
+	msgbox CTRL + LBUTTON
 return
 
 setAppMenu() {
 	gui, % appWindow.hwnd ":default"
-	Menu, FileMenu, Add, E&xit, Exit
+	Menu, FileMenu, Add, E&xit, ExitAction
 
 	fn := func("menuAbout")
 	Menu, HelpMenu, Add, &About, % fn
@@ -121,7 +138,7 @@ menuAbout() {
 }
 
 
-Exit:
+ExitAction:
 	configManager.save()
 	ExitApp
 return

@@ -8,11 +8,14 @@ class Plugin {
 	settingsWindow := {}
 
 	; Constructor / Delegation of customizations
+	; Acting as an integrated factory for compisition
 	__New() {
 		this.settings := new Plugin_Settings(this)
 		this.settingsWindow := new Plugin_SettingsWindow(this)
+		this.settingsWindow.setParent(appWindow.getHwnd())
 
 		; Add author defined settings
+		this.initLocal()
 		this.initSettings(this.settings)
 
 		; Build plugin settings window components
@@ -25,13 +28,13 @@ class Plugin {
  	; Overriden methods
  	;;
 	initSettings(settings) {
-		settings.add("default", 69, "default setting")
+		this.settings.add("default", 69, "default setting")
 	}
 	buildSettingsWindow(window) {
-		window.addControl("edit", "w200 r3", "Default control")
+		this.window.addControl("edit", "w200 r3", "Default control")
 	}
 	run() {
-		; Do something cool
+		msgbox % this.name " activated"
 	}
 
 	;;
@@ -72,9 +75,6 @@ class Plugin {
 	setSetting(setting, value) {
 		this.settings.set(setting, value)
 	}
-	setSettingsWindowParent(hwnd) {
-		this.settingsWindow.setParent(hwdn)
-	}
 
 
 	;;
@@ -82,9 +82,13 @@ class Plugin {
 	;;
 	enable() {
 		this.active := 1
+		if &this.enableAction
+			this.enableAction()
 	}
 	disable() {
 		this.active := 0
+		if &this.disableAction
+			this.disableAction()
 	}
 	showSettingsWindow() {
 		this.settingsWindow.show()

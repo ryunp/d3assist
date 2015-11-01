@@ -8,11 +8,13 @@ class Plugin_Move_Mouse extends Plugin {
 	initSettings(settings) {
 		settings.add("speed", 50, "1-100, lower is faster")
 		settings.add("distance", 500, "Pixels to travel")
+		settings.add("bob", 2, "bob!")
 	}
 	
 	buildSettingsWindow(window) {
 		window.addEditBox("Speed", "speed")
 		window.addEditBox("Distance","distance")
+		window.addEditBox("This is Bob","bob")
 	}
 
 	run() {
