@@ -2,6 +2,8 @@
 ### A plugin manager
 The idea is to create plugins that will help reduce common and repetitive tasks that cause high cognitive resource drain. Small meanial tasks that interupt the flow of mindless grinding eventually add up. I imagine this application like a character attribute: you gain varying -% CRD (Cognitive Resource Drain) for each plugins effectiveness.
 
+![Screenshot](https://github.com/ryunp/d3assist/blob/master/pic.png)
+
 What this does not do:
 - Automate gameplay
 - Play for you
